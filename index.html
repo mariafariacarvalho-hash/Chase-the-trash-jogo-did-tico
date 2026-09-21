@@ -14,7 +14,7 @@
 
     body {
       overflow: hidden;
-      font-family: Arial, sans-serif;
+      font-family: "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
       background: #87ceeb;
       user-select: none;
     }
@@ -37,16 +37,86 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background:
-        linear-gradient(rgba(0, 20, 10, .45), rgba(0, 0, 0, .75)),
-        linear-gradient(135deg, #64b96b, #193d2a);
+      overflow: hidden;
+      isolation: isolate;
+      background: linear-gradient(160deg, #f05a62 0%, #f58c62 43%, #164d62 100%);
       color: white;
       text-align: center;
     }
 
+    #menu::before,
+    #menu::after {
+      position: absolute;
+      z-index: -1;
+      content: "";
+      pointer-events: none;
+    }
+
+    #menu::before {
+      width: 48vw;
+      height: 48vw;
+      min-width: 360px;
+      min-height: 360px;
+      right: -13vw;
+      top: -25vw;
+      border-radius: 50%;
+      background: #ffdf75;
+      box-shadow: 0 0 0 22px rgba(255, 255, 255, .09), 0 0 0 44px rgba(255, 255, 255, .06);
+    }
+
+    #menu::after {
+      inset: 0;
+      opacity: .22;
+      background-image: linear-gradient(135deg, transparent 0 47%, #fff 48% 50%, transparent 51%), linear-gradient(45deg, transparent 0 47%, #fff 48% 50%, transparent 51%);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(to bottom, black, transparent 65%);
+    }
+
+    .sky, .sun, .cloud, .mountains, .pagoda, .ground {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .sky { inset: 0; z-index: -4; background: linear-gradient(180deg, rgba(20, 60, 110, .38), transparent 65%); }
+    .sun { width: 18vw; height: 18vw; min-width: 140px; min-height: 140px; top: 7vh; right: 12vw; border-radius: 50%; background: #ffdb69; box-shadow: 0 0 55px rgba(255, 219, 105, .55); }
+    .cloud { width: 150px; height: 25px; border-radius: 40px; background: rgba(255,255,255,.7); filter: blur(1px); }
+    .cloud::before, .cloud::after { position: absolute; content: ""; border-radius: 50%; background: inherit; }
+    .cloud::before { width: 58px; height: 58px; left: 24px; bottom: 0; }
+    .cloud::after { width: 78px; height: 78px; right: 20px; bottom: 0; }
+    .cloud.one { top: 18vh; left: 6vw; transform: scale(.7); }
+    .cloud.two { top: 30vh; right: 5vw; transform: scale(.5); opacity: .55; }
+    .mountains { inset: auto 0 17vh; height: 27vh; z-index: -2; background: #287080; clip-path: polygon(0 78%, 13% 40%, 27% 72%, 43% 24%, 59% 73%, 75% 37%, 90% 70%, 100% 35%, 100% 100%, 0 100%); }
+    .fuji { position: absolute; width: 0; height: 0; left: 52%; bottom: 0; border-left: 17vh solid transparent; border-right: 17vh solid transparent; border-bottom: 25vh solid #285b6b; transform: translateX(-50%); }
+    .snow { position: absolute; left: 52%; bottom: 16vh; width: 0; height: 0; border-left: 5vh solid transparent; border-right: 5vh solid transparent; border-bottom: 8vh solid #fff3e0; transform: translateX(-50%); }
+    .pagoda { right: 9vw; bottom: 16vh; width: 80px; height: 145px; z-index: -1; }
+    .pagoda-tip { position: absolute; top: 0; left: 38px; width: 4px; height: 24px; background: #f6d477; }
+    .roof { position: absolute; left: 2px; width: 76px; height: 12px; background: #bb3041; clip-path: polygon(0 35%, 100% 0, 88% 100%, 12% 100%); }
+    .roof:nth-child(2) { top: 20px; } .roof:nth-child(3) { top: 48px; transform: scale(.87); } .roof:nth-child(4) { top: 76px; transform: scale(.74); } .roof:nth-child(5) { top: 104px; transform: scale(.61); }
+    .pagoda-body { position: absolute; top: 20px; left: 22px; width: 36px; height: 112px; background: #f5c15b; border: 4px solid #8f2635; }
+    .ground { bottom: 0; width: 100%; height: 18vh; z-index: -1; background: repeating-linear-gradient(90deg, #152e43 0 9vw, #1b3b52 9vw 9.3vw), linear-gradient(#183f53, #102b40); clip-path: polygon(0 19%, 100% 0, 100% 100%, 0 100%); }
+
+    .panel { width: min(560px, calc(100% - 32px)); padding: 28px 34px 24px; border: 1px solid rgba(255,255,255,.55); border-radius: 22px; background: rgba(17, 35, 57, .76); box-shadow: 0 20px 60px rgba(5, 20, 35, .35), inset 0 1px rgba(255,255,255,.2); backdrop-filter: blur(9px); }
+    .logo { color: #ffdf69; font-size: clamp(42px, 8vw, 76px); font-weight: 900; line-height: .8; letter-spacing: 5px; text-shadow: 4px 4px 0 #d6384a; transform: skew(-8deg); }
+    .subtitle { margin: 4px 0 12px; color: #fff; font-size: 21px; font-weight: 900; letter-spacing: 8px; text-transform: uppercase; }
+    .line { width: 100%; height: 4px; margin: 0 auto 12px; background: linear-gradient(90deg, transparent, #ffdf69, transparent); }
+    .choose { margin-bottom: 11px; color: #ffd66b; font-size: 13px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+    .character-name { margin-top: 6px; font-size: 18px; font-weight: bold; }
+    .controls { margin-top: 17px; color: rgba(255,255,255,.7); font-size: 12px; letter-spacing: .5px; }
+
     #menu h1 {
       font-size: clamp(38px, 7vw, 80px);
       text-shadow: 4px 4px 0 #17351f;
+      margin-bottom: 8px;
+    }
+
+    #selection {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #selection h2 {
+      font-size: clamp(26px, 4vw, 42px);
       margin-bottom: 8px;
     }
 
@@ -59,19 +129,21 @@
     .characters {
       display: flex;
       gap: 20px;
+      justify-content: center;
       margin-bottom: 25px;
     }
 
     .character {
       width: 190px;
       min-height: 210px;
-      border: 3px solid rgba(255,255,255,.35);
-      border-radius: 20px;
-      background: rgba(255,255,255,.12);
+      border: 2px solid rgba(255,255,255,.3);
+      border-radius: 14px;
+      background: rgba(255,255,255,.1);
       color: white;
       cursor: pointer;
       padding: 15px;
       transition: .2s;
+      font-family: inherit;
     }
 
     .character:hover {
@@ -91,6 +163,20 @@
       align-items: center;
       justify-content: center;
       font-size: 80px;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    .avatar img {
+      width: 175px;
+      height: 175px;
+      max-width: none;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .avatar img.cutout {
+      mix-blend-mode: normal;
     }
 
     .character strong {
@@ -98,19 +184,20 @@
       font-size: 22px;
     }
 
-    #startButton {
+    #playButton {
       border: 0;
-      border-radius: 15px;
+      border-radius: 10px;
       padding: 16px 45px;
       font-size: 22px;
       font-weight: bold;
-      background: #ffd43b;
+      background: #ffdb58;
       color: #19321d;
       cursor: pointer;
       box-shadow: 0 7px 0 #a47c00;
+      font-family: inherit;
     }
 
-    #startButton:active {
+    #playButton:active {
       transform: translateY(5px);
       box-shadow: 0 2px 0 #a47c00;
     }
@@ -206,9 +293,11 @@
     }
 
     @media (max-width: 600px) {
+      .panel { padding: 22px 16px 18px; }
       .character {
-        width: 145px;
-        min-height: 180px;
+        width: 135px;
+        min-height: 160px;
+        padding: 10px;
       }
 
       .avatar {
@@ -219,6 +308,10 @@
       #menu h1 {
         font-size: 40px;
       }
+
+      .avatar { height: 80px; font-size: 55px; }
+      .avatar img { width: 130px; height: 130px; }
+      .pagoda { right: 1vw; transform: scale(.7); transform-origin: bottom right; }
     }
   </style>
 </head>
@@ -229,26 +322,22 @@
 
 <!-- MENU -->
 <div id="menu">
-  <h1>🌳 Guarda Ambiental</h1>
-  <p>Escolha quem vai perseguir o poluidor</p>
-
-  <div class="characters">
-
-    <button class="character selected" data-character="pucca">
-      <div class="avatar">👧🏻</div>
-      <strong>Pucca</strong>
-      <small>Guardiã veloz</small>
-    </button>
-
-    <button class="character" data-character="kakashi">
-      <div class="avatar">🥷</div>
-      <strong>Kakashi</strong>
-      <small>Ninja ambiental</small>
-    </button>
-
-  </div>
-
-  <button id="startButton">▶ COMEÇAR</button>
+  <div class="sky"></div><div class="sun"></div>
+  <div class="cloud one"></div><div class="cloud two"></div>
+  <div class="mountains"><div class="mountain-back"></div><div class="fuji"></div><div class="snow"></div></div>
+  <div class="pagoda"><div class="pagoda-tip"></div><div class="roof"></div><div class="roof"></div><div class="roof"></div><div class="roof"></div><div class="pagoda-body"></div></div>
+  <div class="ground"></div>
+  <main class="panel">
+    <div class="logo">FUJI</div><div class="subtitle">Rush</div><div class="line"></div>
+    <p>Corra. Desvie. Sobreviva.</p>
+    <div class="choose">Escolha quem vai perseguir você</div>
+    <div class="characters">
+      <button class="character selected" data-character="kakashi"><div class="avatar">🥷</div><div class="character-name">Kakashi</div></button>
+      <button class="character" data-character="pucca"><div class="avatar">🧧</div><div class="character-name">Pucca</div></button>
+    </div>
+    <button id="playButton">▶ JOGAR</button>
+    <div class="controls">← → mover &nbsp; • &nbsp; ↑ pular &nbsp; • &nbsp; ↓ deslizar</div>
+  </main>
 </div>
 
 <!-- HUD -->
@@ -267,7 +356,7 @@
 </div>
 
 <div id="message">
-  Pegue o poluidor!
+  Limpe a cidade e acumule pontos de poluição evitada!
 </div>
 
 <!-- CONTROLES MOBILE -->
@@ -279,8 +368,8 @@
 
 <!-- GAME OVER -->
 <div id="gameOver">
-  <h2>🚨 FIM DE JOGO</h2>
-  <p>O poluidor conseguiu escapar!</p>
+  <h2 id="endTitle">🚨 FIM DE JOGO</h2>
+  <p id="endMessage">A cidade precisa de você novamente.</p>
   <p>Você recolheu <strong id="finalScore">0</strong> lixos.</p>
   <button id="restart">Jogar novamente</button>
 </div>
@@ -299,8 +388,6 @@
   let renderer;
 
   let player;
-  let criminal;
-
   let trash = [];
   let trees = [];
   let obstacles = [];
@@ -319,7 +406,7 @@
 
   let targetX = 0;
 
-  let speed = 0.22;
+  let speed = 0.34;
 
   let verticalVelocity = 0;
   let grounded = true;
@@ -348,4 +435,373 @@
     button.addEventListener("click", () => {
 
       document.querySelectorAll(".character")
-        .forEach(b => b.classList.remove
+        .forEach(b => b.classList.remove("selected"));
+
+      button.classList.add("selected");
+      selectedCharacter = button.dataset.character;
+    });
+  });
+
+  const playButton = document.getElementById("playButton");
+  const restartButton = document.getElementById("restart");
+  const finalScoreText = document.getElementById("finalScore");
+
+  playButton.addEventListener("click", () => {
+    startGame();
+  });
+  restartButton.addEventListener("click", startGame);
+
+  function createPlayer() {
+    const group = new THREE.Group();
+    if (selectedCharacter === "kakashi") {
+      const kakashiTexture = new THREE.TextureLoader().load("https://i.pinimg.com/736x/6a/8d/1a/6a8d1a83cae38480647b9d9f70ad9cb0.jpg");
+      kakashiTexture.colorSpace = THREE.SRGBColorSpace;
+      const sideMaterial = new THREE.MeshStandardMaterial({ color: 0x151d24, roughness: .72, metalness: .05 });
+      const imageMaterial = new THREE.MeshStandardMaterial({ map: kakashiTexture, roughness: .82, metalness: 0 });
+      const kakashi = new THREE.Mesh(
+        new THREE.BoxGeometry(1.75, 2.65, .22),
+        [sideMaterial, sideMaterial, sideMaterial, sideMaterial, imageMaterial, sideMaterial]
+      );
+      kakashi.position.y = 1.32;
+      kakashi.castShadow = true;
+      group.add(kakashi);
+      group.userData.imageRunner = kakashi;
+      group.position.z = 3;
+      return group;
+    }
+    const color = selectedCharacter === "pucca" ? 0xe85d75 : 0x303b59;
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(.55, 1.1, 4, 12), new THREE.MeshStandardMaterial({ color }));
+    const head = new THREE.Mesh(new THREE.SphereGeometry(.52, 16, 12), new THREE.MeshStandardMaterial({ color: 0xffd1a9 }));
+    body.position.y = 1;
+    head.position.y = 1.95;
+    body.castShadow = true;
+    head.castShadow = true;
+    group.add(body, head);
+    const limbMaterial = new THREE.MeshStandardMaterial({ color: 0x263238, roughness: .9 });
+    const leftArm = new THREE.Mesh(new THREE.CapsuleGeometry(.12, .55, 4, 8), limbMaterial);
+    const rightArm = new THREE.Mesh(new THREE.CapsuleGeometry(.12, .55, 4, 8), limbMaterial);
+    const leftLeg = new THREE.Mesh(new THREE.CapsuleGeometry(.15, .65, 4, 8), limbMaterial);
+    const rightLeg = new THREE.Mesh(new THREE.CapsuleGeometry(.15, .65, 4, 8), limbMaterial);
+    leftArm.position.set(-.58, 1.05, 0);
+    rightArm.position.set(.58, 1.05, 0);
+    leftLeg.position.set(-.25, .2, 0);
+    rightLeg.position.set(.25, .2, 0);
+    [leftArm, rightArm, leftLeg, rightLeg].forEach(limb => {
+      limb.castShadow = true;
+      group.add(limb);
+    });
+    group.userData.runnerParts = { leftArm, rightArm, leftLeg, rightLeg };
+    group.position.z = 3;
+    return group;
+  }
+
+  function createScene() {
+    scene = new THREE.Scene();
+    const skyCanvas = document.createElement("canvas");
+    skyCanvas.width = 2;
+    skyCanvas.height = 512;
+    const skyContext = skyCanvas.getContext("2d");
+    const skyGradient = skyContext.createLinearGradient(0, 0, 0, skyCanvas.height);
+    skyGradient.addColorStop(0, "#171b45");
+    skyGradient.addColorStop(.56, "#d15d58");
+    skyGradient.addColorStop(1, "#ffb36b");
+    skyContext.fillStyle = skyGradient;
+    skyContext.fillRect(0, 0, skyCanvas.width, skyCanvas.height);
+    const skyTexture = new THREE.CanvasTexture(skyCanvas);
+    skyTexture.colorSpace = THREE.SRGBColorSpace;
+    scene.background = skyTexture;
+    scene.fog = new THREE.Fog(0xc86a63, 42, 115);
+    camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, .1, 1000);
+    camera.position.set(0, 5.5, 10);
+    camera.lookAt(0, 1, 0);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    document.getElementById("game").replaceChildren(renderer.domElement);
+    scene.add(new THREE.HemisphereLight(0xffc58f, 0x202d2d, 1.35));
+    const sun = new THREE.DirectionalLight(0xff9b65, 2.4);
+    sun.position.set(-12, 7, -35);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.left = -25;
+    sun.shadow.camera.right = 25;
+    sun.shadow.camera.top = 25;
+    sun.shadow.camera.bottom = -25;
+    scene.add(sun);
+
+    const sunset = new THREE.Mesh(
+      new THREE.SphereGeometry(4.5, 32, 20),
+      new THREE.MeshBasicMaterial({ color: 0xffcf78 })
+    );
+    sunset.position.set(-13, 9, -75);
+    scene.add(sunset);
+
+    const cityMaterial = new THREE.MeshStandardMaterial({ roughness: .92, metalness: .02 });
+    const road = new THREE.Mesh(new THREE.PlaneGeometry(14, 110), new THREE.MeshStandardMaterial({ color: 0x252b2d, roughness: .98, metalness: .02 }));
+    road.rotation.x = -Math.PI / 2;
+    road.position.y = -.04;
+    road.position.z = -35;
+    road.receiveShadow = true;
+    scene.add(road);
+
+    const sidewalkMaterial = new THREE.MeshStandardMaterial({ color: 0x858887, roughness: .88 });
+    [-8, 8].forEach(side => {
+      const sidewalk = new THREE.Mesh(new THREE.BoxGeometry(5, .25, 110), sidewalkMaterial);
+      sidewalk.position.set(side, .08, -35);
+      sidewalk.receiveShadow = true;
+      scene.add(sidewalk);
+    });
+
+    const curbMaterial = new THREE.MeshStandardMaterial({ color: 0x4a5352, roughness: .9 });
+    [-7.15, 7.15].forEach(side => {
+      const curb = new THREE.Mesh(new THREE.BoxGeometry(.22, .32, 110), curbMaterial);
+      curb.position.set(side, .2, -35);
+      curb.castShadow = true;
+      scene.add(curb);
+    });
+
+    for (let markerIndex = 0; markerIndex < 24; markerIndex++) {
+      const marker = new THREE.Mesh(new THREE.BoxGeometry(.12, .025, 2.2), new THREE.MeshBasicMaterial({ color: 0xf8e9a1 }));
+      marker.position.set(0, .02, -markerIndex * 4 - 2);
+      scene.add(marker);
+    }
+
+    const crosswalkMaterial = new THREE.MeshStandardMaterial({ color: 0xe7e7df, roughness: .8 });
+    for (let stripeIndex = -3; stripeIndex <= 3; stripeIndex++) {
+      const stripe = new THREE.Mesh(new THREE.BoxGeometry(.7, .025, 3.8), crosswalkMaterial);
+      stripe.position.set(stripeIndex * 1.45, .015, -7);
+      scene.add(stripe);
+    }
+
+    const fuji = new THREE.Group();
+    const mountain = new THREE.Mesh(new THREE.ConeGeometry(13, 15, 64), new THREE.MeshStandardMaterial({ color: 0x566c68, roughness: 1 }));
+    mountain.position.y = 7.5;
+    const snow = new THREE.Mesh(new THREE.ConeGeometry(5.8, 7.2, 64), new THREE.MeshStandardMaterial({ color: 0xf1f4f0, roughness: .95 }));
+    snow.position.y = 12.1;
+    fuji.add(mountain, snow);
+    fuji.position.set(8, 0, -82);
+    fuji.scale.setScalar(.82);
+    scene.add(fuji);
+
+    const torii = new THREE.Group();
+    const toriiMaterial = new THREE.MeshStandardMaterial({ color: 0x8d3028, roughness: .72 });
+    const toriiPostGeometry = new THREE.CylinderGeometry(.12, .16, 3.4, 10);
+    [-1.25, 1.25].forEach(x => {
+      const post = new THREE.Mesh(toriiPostGeometry, toriiMaterial);
+      post.position.set(x, 1.7, 0);
+      post.castShadow = true;
+      torii.add(post);
+    });
+    const toriiLintel = new THREE.Mesh(new THREE.BoxGeometry(3.2, .18, .22), toriiMaterial);
+    toriiLintel.position.y = 3.25;
+    toriiLintel.castShadow = true;
+    torii.add(toriiLintel);
+    const toriiLowerLintel = new THREE.Mesh(new THREE.BoxGeometry(2.7, .14, .18), toriiMaterial);
+    toriiLowerLintel.position.y = 2.85;
+    torii.add(toriiLowerLintel);
+    torii.position.set(5.7, 0, -51);
+    torii.scale.setScalar(.72);
+    scene.add(torii);
+
+    const addBuilding = (side, depth, width, height, color, accent) => {
+      const building = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.BoxGeometry(width, height, 5), cityMaterial.clone());
+      body.material.color.setHex(color);
+      body.position.y = height / 2;
+      building.add(body);
+
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(width + .25, .18, 5.2), cityMaterial.clone());
+      roof.material.color.setHex(accent);
+      roof.position.y = height + .1;
+      building.add(roof);
+
+      for (let floor = 0; floor < Math.floor(height / 1.6); floor++) {
+        for (let windowIndex = 0; windowIndex < Math.max(1, Math.floor(width / 1.2)); windowIndex++) {
+          const window = new THREE.Mesh(new THREE.BoxGeometry(.035, .62, .52), new THREE.MeshStandardMaterial({ color: 0xffe7a1, emissive: 0x5a4210, emissiveIntensity: .45 }));
+          window.position.set(-side * (width / 2 + .03), 1 + floor * 1.6, -2 + windowIndex * 1.2);
+          building.add(window);
+        }
+      }
+
+      const sign = new THREE.Mesh(new THREE.BoxGeometry(.08, .5, Math.min(width - .6, 2.8)), new THREE.MeshBasicMaterial({ color: accent }));
+      sign.position.set(-side * (width / 2 + .06), Math.min(height - .8, 3.2), 0);
+      building.add(sign);
+      building.position.set(side * (10.5 + width / 2), 0, depth);
+      scene.add(building);
+    };
+
+    const buildings = [
+      [-22, 4, 9, 0x9d9d98, 0x394c55], [-8, 5, 13, 0xb8afa0, 0x5f3732],
+      [7, 4, 8, 0x899b98, 0x394c55], [22, 5, 15, 0xa29a91, 0x5f3732],
+      [-38, 5, 12, 0x667277, 0x263c4b], [-40, 4.3, 18, 0x958078, 0x573f3c],
+      [-54, 3.8, 11, 0x7d7774, 0x263c4b], [-58, 6, 14, 0x777d80, 0x573f3c]
+    ];
+    buildings.forEach((building, index) => addBuilding(index % 2 === 0 ? -1 : 1, building[0], building[1], building[2], building[3], building[4]));
+
+    const addTree = (side, depth) => {
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.12, .16, 1.3, 8), new THREE.MeshStandardMaterial({ color: 0x704b32 }));
+      trunk.position.set(side * 7.3, .75, depth);
+      trunk.castShadow = true;
+      scene.add(trunk);
+      const crown = new THREE.Mesh(new THREE.SphereGeometry(.8, 10, 8), new THREE.MeshStandardMaterial({ color: 0x3d9a68 }));
+      crown.position.set(side * 7.3, 1.7, depth);
+      crown.castShadow = true;
+      scene.add(crown);
+    };
+
+    const addLamp = (side, depth) => {
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(.06, .08, 3.3, 8), new THREE.MeshStandardMaterial({ color: 0x3b4650 }));
+      pole.position.set(side * 6.2, 1.65, depth);
+      scene.add(pole);
+      const light = new THREE.Mesh(new THREE.SphereGeometry(.18, 10, 8), new THREE.MeshBasicMaterial({ color: 0xfff1b0 }));
+      light.position.set(side * 6.2, 3.35, depth);
+      scene.add(light);
+    };
+
+    for (let streetIndex = 0; streetIndex < 12; streetIndex++) {
+      const depth = -streetIndex * 8 - 2;
+      addTree(streetIndex % 2 === 0 ? -1 : 1, depth);
+      addLamp(streetIndex % 2 === 0 ? 1 : -1, depth - 2);
+    }
+
+    player = createPlayer();
+    scene.add(player);
+
+    trash = [];
+    for (let index = 0; index < 36; index++) {
+      const item = new THREE.Mesh(new THREE.BoxGeometry(.45, .45, .45), new THREE.MeshStandardMaterial({ color: index % 2 ? 0x52b788 : 0xf3d34a }));
+      item.position.set((index % 3 - 1) * laneWidth, .25, -index * 5 - 6);
+      item.rotation.set(Math.random(), Math.random(), Math.random());
+      item.userData.thrown = false;
+      item.castShadow = true;
+      scene.add(item);
+      trash.push(item);
+    }
+  }
+
+  function resetGame() {
+    score = 0;
+    distance = 0;
+    life = 3;
+    lane = 0;
+    targetX = 0;
+    speed = .34;
+    scoreText.textContent = score;
+    distanceText.textContent = distance;
+    lifeText.textContent = life;
+    finalScoreText.textContent = score;
+  }
+
+  function startGame() {
+    resetGame();
+    gameOver.style.display = "none";
+    menu.style.display = "none";
+    hud.style.display = "flex";
+    controls.style.display = "flex";
+    createScene();
+    running = true;
+    clock.start();
+    requestAnimationFrame(gameLoop);
+  }
+
+  function move(direction) {
+    if (!running) return;
+    lane = Math.max(-1, Math.min(1, lane + direction));
+    targetX = lane * laneWidth;
+  }
+
+  function jump() {
+    if (running && grounded) {
+      verticalVelocity = .22;
+      grounded = false;
+    }
+  }
+
+  function gameLoop() {
+    if (!running) return;
+    const delta = Math.min(clock.getDelta(), .05);
+    player.position.x += (targetX - player.position.x) * .15;
+    verticalVelocity -= .012;
+    player.position.y += verticalVelocity;
+    if (player.position.y <= 0) {
+      player.position.y = 0;
+      verticalVelocity = 0;
+      grounded = true;
+    }
+    speed = Math.min(speed + delta * .012, .52);
+    const runTime = performance.now() * .018;
+    const step = Math.sin(runTime * 1.35);
+    player.rotation.z = step * .035;
+    if (player.userData.runnerParts) {
+      const { leftArm, rightArm, leftLeg, rightLeg } = player.userData.runnerParts;
+      leftArm.rotation.z = step * .65;
+      rightArm.rotation.z = -step * .65;
+      leftLeg.rotation.z = -step * .42;
+      rightLeg.rotation.z = step * .42;
+    } else if (player.userData.imageRunner && grounded) {
+      player.position.y = Math.abs(step) * .07;
+      player.userData.imageRunner.rotation.z = step * .025;
+    }
+    if (grounded && player.userData.runnerParts) player.position.y = Math.abs(step) * .035;
+    trash.forEach(item => {
+      item.position.z += speed;
+      item.rotation.y += .04;
+      if (item.position.z > 7) {
+        item.position.z -= 180;
+        item.position.x = (Math.floor(Math.random() * 3) - 1) * laneWidth;
+        item.visible = true;
+        item.userData.thrown = Math.random() < .2;
+        item.position.y = item.userData.thrown ? 1.1 : .25;
+      }
+      if (item.userData.thrown && item.position.z > -6) {
+        item.position.y = 1.1 + Math.sin(performance.now() * .012) * .3;
+      }
+      if (item.visible && Math.abs(item.position.x - player.position.x) < 1.2 && Math.abs(item.position.z - player.position.z) < 1 && Math.abs(item.position.y - player.position.y - .5) < 1) {
+        item.visible = false;
+        if (item.userData.thrown) {
+          life--;
+          lifeText.textContent = life;
+          if (life <= 0) endGame("Você foi atingido por lixo demais!", false);
+        } else {
+          score++;
+          scoreText.textContent = score;
+        }
+      }
+    });
+    distance += Math.round(delta * speed * 100);
+    distanceText.textContent = distance;
+    renderer.render(scene, camera);
+    requestAnimationFrame(gameLoop);
+  }
+
+  function endGame(message = "A cidade precisa de você novamente.", won = false) {
+    running = false;
+    finalScoreText.textContent = score;
+    document.getElementById("endTitle").textContent = won ? "🏆 CIDADE LIMPA!" : "🚨 FIM DE JOGO";
+    document.getElementById("endMessage").textContent = message;
+    gameOver.style.display = "flex";
+    controls.style.display = "none";
+  }
+
+  document.getElementById("left").addEventListener("click", () => move(-1));
+  document.getElementById("right").addEventListener("click", () => move(1));
+  document.getElementById("jump").addEventListener("click", jump);
+  document.addEventListener("keydown", event => {
+    if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") move(-1);
+    if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") move(1);
+    if (event.key === "ArrowUp" || event.key === "w" || event.key === " ") jump();
+  });
+  addEventListener("resize", () => {
+    if (!camera || !renderer) return;
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+</script>
+</body>
+</html>
