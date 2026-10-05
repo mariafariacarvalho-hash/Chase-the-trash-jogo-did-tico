@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guarda Ambiental</title>
+  <title>Pucca Eco Run - Trilhos Verdes</title>
 
   <style>
     * {
@@ -271,6 +271,13 @@
       background: rgba(0,0,0,.7);
     }
 
+    #failurePanel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+    }
+
     #gameOver h2 {
       font-size: 60px;
       margin-bottom: 15px;
@@ -288,6 +295,53 @@
       background: #4ade80;
       color: #12351d;
       font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #winStory {
+      display: none;
+      flex-direction: column;
+      width: min(760px, calc(100% - 32px));
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      padding: 24px 30px;
+      border: 2px solid #ff1744;
+      border-radius: 12px;
+      background: rgba(10, 10, 10, .96);
+      text-align: left;
+    }
+
+    #winStory h2 {
+      color: #ffeb3b;
+      font-size: clamp(23px, 4vw, 32px);
+      text-align: center;
+    }
+
+    #storyLines {
+      display: grid;
+      gap: 9px;
+      margin: 6px 0 18px;
+    }
+
+    .story-line {
+      margin: 0 !important;
+      font-size: 16px !important;
+      line-height: 1.45;
+    }
+
+    .story-line.pucca { color: #ff8a80; }
+    .story-line.thief { color: #b0bec5; }
+    .story-line.thief.apology { color: #fff; }
+
+    #restartWin {
+      align-self: center;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 8px;
+      background: #4ade80;
+      color: #12351d;
+      font: inherit;
       font-weight: bold;
       cursor: pointer;
     }
@@ -328,26 +382,26 @@
   <div class="pagoda"><div class="pagoda-tip"></div><div class="roof"></div><div class="roof"></div><div class="roof"></div><div class="roof"></div><div class="pagoda-body"></div></div>
   <div class="ground"></div>
   <main class="panel">
-    <div class="logo">FUJI</div><div class="subtitle">Rush</div><div class="line"></div>
-    <p>Corra. Desvie. Sobreviva.</p>
-    <div class="choose">Escolha quem vai perseguir você</div>
+    <div class="logo">PUCCA</div><div class="subtitle">Eco Run</div><div class="line"></div>
+    <p>Persiga o ladrão. Recicle. Salve a cidade.</p>
+    <div class="choose">Escolha quem vai limpar a cidade</div>
     <div class="characters">
-      <button class="character selected" data-character="kakashi"><div class="avatar">🥷</div><div class="character-name">Kakashi</div></button>
-      <button class="character" data-character="pucca"><div class="avatar">🧧</div><div class="character-name">Pucca</div></button>
+      <button class="character" data-character="kakashi"><div class="avatar">🥷</div><div class="character-name">Kakashi</div></button>
+      <button class="character selected" data-character="pucca"><div class="avatar">🧧</div><div class="character-name">Pucca</div></button>
     </div>
     <button id="playButton">▶ JOGAR</button>
-    <div class="controls">← → mover &nbsp; • &nbsp; ↑ pular &nbsp; • &nbsp; ↓ deslizar</div>
+    <div class="controls">← → mudar de faixa &nbsp; • &nbsp; ↑ pular</div>
   </main>
 </div>
 
 <!-- HUD -->
 <div id="hud">
   <div class="hudBox">
-    🗑️ Lixos: <span id="score">0</span>
+    ♻️ Reciclados: <span id="score">0</span>
   </div>
 
   <div class="hudBox">
-    🏃 Distância: <span id="distance">0</span>m
+    🥷 Ladrão: <span id="distance">400</span>m
   </div>
 
   <div class="hudBox">
@@ -368,10 +422,17 @@
 
 <!-- GAME OVER -->
 <div id="gameOver">
-  <h2 id="endTitle">🚨 FIM DE JOGO</h2>
-  <p id="endMessage">A cidade precisa de você novamente.</p>
-  <p>Você recolheu <strong id="finalScore">0</strong> lixos.</p>
-  <button id="restart">Jogar novamente</button>
+  <div id="failurePanel">
+    <h2 id="endTitle">🚨 FIM DE JOGO</h2>
+    <p id="endMessage">A cidade precisa de você novamente.</p>
+    <p>Você recolheu <strong id="finalScore">0</strong> recicláveis.</p>
+    <button id="restart">Jogar novamente</button>
+  </div>
+  <section id="winStory" aria-labelledby="storyTitle">
+    <h2 id="storyTitle">PUCCA CONSCIENTIZA O MUNDO!</h2>
+    <div id="storyLines"></div>
+    <button id="restartWin">Salvar o Planeta e Reiniciar</button>
+  </section>
 </div>
 
 <script type="module">
@@ -388,6 +449,7 @@
   let renderer;
 
   let player;
+  let thief;
   let trash = [];
   let trees = [];
   let obstacles = [];
@@ -397,7 +459,7 @@
   let running = false;
 
   let score = 0;
-  let distance = 0;
+  let distance = 400;
   let life = 3;
 
   let lane = 0;
@@ -445,11 +507,13 @@
   const playButton = document.getElementById("playButton");
   const restartButton = document.getElementById("restart");
   const finalScoreText = document.getElementById("finalScore");
+  const restartWinButton = document.getElementById("restartWin");
 
   playButton.addEventListener("click", () => {
     startGame();
   });
   restartButton.addEventListener("click", startGame);
+  restartWinButton.addEventListener("click", startGame);
 
   function createPlayer() {
     const group = new THREE.Group();
@@ -469,7 +533,8 @@
       group.position.z = 3;
       return group;
     }
-    const color = selectedCharacter === "pucca" ? 0xe85d75 : 0x303b59;
+    const isPucca = selectedCharacter === "pucca";
+    const color = isPucca ? 0xe6293e : 0x303b59;
     const body = new THREE.Mesh(new THREE.CapsuleGeometry(.55, 1.1, 4, 12), new THREE.MeshStandardMaterial({ color }));
     const head = new THREE.Mesh(new THREE.SphereGeometry(.52, 16, 12), new THREE.MeshStandardMaterial({ color: 0xffd1a9 }));
     body.position.y = 1;
@@ -477,6 +542,24 @@
     body.castShadow = true;
     head.castShadow = true;
     group.add(body, head);
+    if (isPucca) {
+      const hairMaterial = new THREE.MeshStandardMaterial({ color: 0x171719, roughness: .9 });
+      const hair = new THREE.Mesh(new THREE.SphereGeometry(.55, 16, 12), hairMaterial);
+      hair.position.set(0, 2.18, -.04);
+      hair.scale.set(1, .62, .85);
+      group.add(hair);
+      [-.42, .42].forEach(x => {
+        const bun = new THREE.Mesh(new THREE.SphereGeometry(.22, 12, 10), hairMaterial);
+        bun.position.set(x, 2.34, -.02);
+        group.add(bun);
+      });
+      const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x171719 });
+      [-.17, .17].forEach(x => {
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(.045, 8, 8), eyeMaterial);
+        eye.position.set(x, 1.98, .48);
+        group.add(eye);
+      });
+    }
     const limbMaterial = new THREE.MeshStandardMaterial({ color: 0x263238, roughness: .9 });
     const leftArm = new THREE.Mesh(new THREE.CapsuleGeometry(.12, .55, 4, 8), limbMaterial);
     const rightArm = new THREE.Mesh(new THREE.CapsuleGeometry(.12, .55, 4, 8), limbMaterial);
@@ -672,6 +755,9 @@
     player = createPlayer();
     scene.add(player);
 
+    thief = createThief();
+    scene.add(thief);
+
     trash = [];
     for (let index = 0; index < 36; index++) {
       const item = new THREE.Mesh(new THREE.BoxGeometry(.45, .45, .45), new THREE.MeshStandardMaterial({ color: index % 2 ? 0x52b788 : 0xf3d34a }));
@@ -684,9 +770,35 @@
     }
   }
 
+  function createThief() {
+    const group = new THREE.Group();
+    const body = new THREE.Mesh(
+      new THREE.CapsuleGeometry(.48, .95, 4, 10),
+      new THREE.MeshStandardMaterial({ color: 0x263238, roughness: .9 })
+    );
+    body.position.y = .95;
+    const head = new THREE.Mesh(
+      new THREE.SphereGeometry(.43, 14, 10),
+      new THREE.MeshStandardMaterial({ color: 0xb87955 })
+    );
+    head.position.y = 1.8;
+    const mask = new THREE.Mesh(
+      new THREE.BoxGeometry(.72, .2, .12),
+      new THREE.MeshStandardMaterial({ color: 0xc52d38 })
+    );
+    mask.position.set(0, 1.82, .35);
+    [body, head, mask].forEach(part => {
+      part.castShadow = true;
+      group.add(part);
+    });
+    group.position.set(0, 0, -36);
+    group.scale.setScalar(1.25);
+    return group;
+  }
+
   function resetGame() {
     score = 0;
-    distance = 0;
+    distance = 400;
     life = 3;
     lane = 0;
     targetX = 0;
@@ -748,6 +860,8 @@
       player.userData.imageRunner.rotation.z = step * .025;
     }
     if (grounded && player.userData.runnerParts) player.position.y = Math.abs(step) * .035;
+    thief.position.z = -2 - distance * .034;
+    thief.position.y = Math.abs(Math.sin(runTime * .7)) * .08;
     trash.forEach(item => {
       item.position.z += speed;
       item.rotation.y += .04;
@@ -770,11 +884,12 @@
         } else {
           score++;
           scoreText.textContent = score;
+          distance = Math.max(0, distance - 60);
+          distanceText.textContent = distance;
+          if (distance === 0) endGame("Você alcançou o ladrão e salvou a cidade!", true);
         }
       }
     });
-    distance += Math.round(delta * speed * 100);
-    distanceText.textContent = distance;
     renderer.render(scene, camera);
     requestAnimationFrame(gameLoop);
   }
@@ -782,8 +897,34 @@
   function endGame(message = "A cidade precisa de você novamente.", won = false) {
     running = false;
     finalScoreText.textContent = score;
-    document.getElementById("endTitle").textContent = won ? "🏆 CIDADE LIMPA!" : "🚨 FIM DE JOGO";
-    document.getElementById("endMessage").textContent = message;
+    const failurePanel = document.getElementById("failurePanel");
+    const winStory = document.getElementById("winStory");
+    failurePanel.style.display = won ? "none" : "flex";
+    winStory.style.display = won ? "flex" : "none";
+    if (won) {
+      const lines = [
+        "Pucca: 'Pare aí mesmo, Tobe! Jogar lixo no chão destrói nossa cidade e o planeta!'",
+        "Pucca: 'O descarte incorreto polui os rios, entope bueiros e prejudica os animais.'",
+        "Pucca: 'Tudo o que você jogou nos trilhos poderia ser reciclado e transformado!'",
+        "Ladrão (Tobe): 'Olha para o chão com os olhos cheios de lágrimas...'",
+        "Ladrão (Tobe): 'Eu... eu não sabia o tamanho do dano que estava causando...'",
+        "Ladrão (Tobe): 'Estou muito arrependido. Prometo que de hoje em diante'",
+        "Ladrão (Tobe): 'vou coletar, separar e reciclar tudo! Me desculpe, Pucca!'"
+      ];
+      const storyContainer = document.getElementById("storyLines");
+      storyContainer.replaceChildren(...lines.map(line => {
+        const paragraph = document.createElement("p");
+        paragraph.className = "story-line";
+        paragraph.textContent = line;
+        if (line.startsWith("Pucca")) paragraph.classList.add("pucca");
+        else paragraph.classList.add("thief");
+        if (line.includes("arrependido")) paragraph.classList.add("apology");
+        return paragraph;
+      }));
+    } else {
+      document.getElementById("endTitle").textContent = "🚨 FIM DE JOGO";
+      document.getElementById("endMessage").textContent = message;
+    }
     gameOver.style.display = "flex";
     controls.style.display = "none";
   }
