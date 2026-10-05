@@ -175,6 +175,17 @@
       object-position: center;
     }
 
+    .avatar img.pucca-art,
+    #introAvatar img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: center;
+      border-radius: 12px;
+      background: rgba(255,255,255,.08);
+    }
+
     .avatar img.cutout {
       mix-blend-mode: normal;
     }
@@ -238,7 +249,13 @@
       background: linear-gradient(155deg, #f18a68, #a8404b);
     }
 
-    #introAvatar { font-size: 76px; }
+    #introAvatar {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      font-size: 76px;
+    }
 
     .intro-wave {
       position: absolute;
@@ -459,6 +476,14 @@
       line-height: 1.2;
     }
 
+    .story-avatar img {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center;
+    }
+
     .story-mouth {
       position: absolute;
       left: 50%;
@@ -562,8 +587,7 @@
     <p>Persiga o ladrão. Recicle. Salve a cidade.</p>
     <div class="choose">Escolha quem vai limpar a cidade</div>
     <div class="characters">
-      <button class="character" data-character="kakashi"><div class="avatar">🥷</div><div class="character-name">Kakashi</div></button>
-      <button class="character selected" data-character="pucca"><div class="avatar">🧧</div><div class="character-name">Pucca</div></button>
+      <button class="character selected" data-character="pucca"><div class="avatar"><img class="pucca-art" src="https://m.media-amazon.com/images/M/MV5BNDExYTY3MDktNDBjMi00YTI0LTk5NmUtODg5YjdjYzc0OWI4XkEyXkFqcGdeQXRyYW5zY29kZS13b3JrZmxvdw@@._V1_QL75_UX500_CR0,24,500,281_.jpg" alt="Pucca" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Crect width=%22220%22 height=%22220%22 rx=%2230%22 fill=%22%23f2c758%22/%3E%3Ctext x=%2250%25%22 y=%2252%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2282%22 font-family=%22Arial, sans-serif%22%3E🧧%3C/text%3E%3C/svg%3E';" /></div><div class="character-name">Pucca</div></button>
     </div>
     <button id="playButton">▶ JOGAR</button>
     <div class="controls">← → mudar de faixa &nbsp; • &nbsp; ↑ pular</div>
@@ -573,7 +597,7 @@
 <div id="intro" role="dialog" aria-modal="true" aria-labelledby="introTitle">
   <section class="intro-panel">
     <div class="intro-character" aria-hidden="true">
-      <span id="introAvatar">🧧</span>
+      <span id="introAvatar"><img class="pucca-art" src="https://m.media-amazon.com/images/M/MV5BNDExYTY3MDktNDBjMi00YTI0LTk5NmUtODg5YjdjYzc0OWI4XkEyXkFqcGdeQXRyYW5zY29kZS13b3JrZmxvdw@@._V1_QL75_UX500_CR0,24,500,281_.jpg" alt="Pucca" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Crect width=%22220%22 height=%22220%22 rx=%2230%22 fill=%22%23f2c758%22/%3E%3Ctext x=%2250%25%22 y=%2252%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2282%22 font-family=%22Arial, sans-serif%22%3E🧧%3C/text%3E%3C/svg%3E';" /></span>
       <span class="intro-wave">👋</span>
     </div>
     <div class="intro-copy">
@@ -595,7 +619,7 @@
   </div>
 
   <div class="hudBox">
-    🥷 Ladrão: <span id="distance">400</span>m
+    🥷 Ladrão: <span id="distance">1000</span>m
   </div>
 
   <div class="hudBox">
@@ -625,7 +649,7 @@
   <section id="winStory" aria-labelledby="storyTitle">
     <h2 id="storyTitle">PUCCA CONSCIENTIZA O MUNDO!</h2>
     <div id="storyStage" aria-hidden="true">
-      <div class="story-person" data-speaker="pucca"><span class="story-avatar">👧🏻</span><span class="story-mouth"></span></div>
+      <div class="story-person" data-speaker="pucca"><span class="story-avatar"><img src="https://m.media-amazon.com/images/M/MV5BNDExYTY3MDktNDBjMi00YTI0LTk5NmUtODg5YjdjYzc0OWI4XkEyXkFqcGdeQXRyYW5zY29kZS13b3JrZmxvdw@@._V1_QL75_UX500_CR0,24,500,281_.jpg" alt="Pucca"></span><span class="story-mouth"></span></div>
       <div class="story-person" data-speaker="thief"><span class="story-avatar">🥷</span><span class="story-mouth"></span><span class="story-tears">💧</span></div>
     </div>
     <div id="storyLines" aria-live="polite">
@@ -661,7 +685,9 @@
   let running = false;
 
   let score = 0;
-  let distance = 400;
+  const startingDistance = 1000;
+  const distancePerRecycle = 25;
+  let distance = startingDistance;
   let life = 3;
 
   let lane = 0;
@@ -703,8 +729,12 @@
         .forEach(b => b.classList.remove("selected"));
 
       button.classList.add("selected");
-      selectedCharacter = button.dataset.character;
-      document.getElementById("introAvatar").textContent = selectedCharacter === "pucca" ? "🧧" : "🥷";
+      selectedCharacter = "pucca";
+
+      const introAvatar = document.getElementById("introAvatar");
+      if (selectedCharacter === "pucca") {
+        introAvatar.innerHTML = '<img class="pucca-art" src="https://m.media-amazon.com/images/M/MV5BNDExYTY3MDktNDBjMi00YTI0LTk5NmUtODg5YjdjYzc0OWI4XkEyXkFqcGdeQXRyYW5zY29kZS13b3JrZmxvdw@@._V1_QL75_UX500_CR0,24,500,281_.jpg" alt="Pucca" onerror="this.onerror=null;this.src=\'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Crect width=%22220%22 height=%22220%22 rx=%2230%22 fill=%22%23f2c758%22/%3E%3Ctext x=%2250%25%22 y=%2252%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2282%22 font-family=%22Arial, sans-serif%22%3E🧧%3C/text%3E%3C/svg%3E\';" />';
+      }
     });
   });
 
@@ -767,24 +797,7 @@
 
   function createPlayer() {
     const group = new THREE.Group();
-    if (selectedCharacter === "kakashi") {
-      const kakashiTexture = new THREE.TextureLoader().load("https://i.pinimg.com/736x/6a/8d/1a/6a8d1a83cae38480647b9d9f70ad9cb0.jpg");
-      kakashiTexture.colorSpace = THREE.SRGBColorSpace;
-      const sideMaterial = new THREE.MeshStandardMaterial({ color: 0x151d24, roughness: .72, metalness: .05 });
-      const imageMaterial = new THREE.MeshStandardMaterial({ map: kakashiTexture, roughness: .82, metalness: 0 });
-      const kakashi = new THREE.Mesh(
-        new THREE.BoxGeometry(1.75, 2.65, .22),
-        [sideMaterial, sideMaterial, sideMaterial, sideMaterial, imageMaterial, sideMaterial]
-      );
-      kakashi.position.y = 1.32;
-      kakashi.castShadow = true;
-      group.add(kakashi);
-      group.userData.imageRunner = kakashi;
-      group.position.z = 3;
-      return group;
-    }
-    const isPucca = selectedCharacter === "pucca";
-    const color = isPucca ? 0xe6293e : 0x303b59;
+    const color = 0xe6293e;
     const body = new THREE.Mesh(new THREE.CapsuleGeometry(.55, 1.1, 4, 12), new THREE.MeshStandardMaterial({ color }));
     const head = new THREE.Mesh(new THREE.SphereGeometry(.52, 16, 12), new THREE.MeshStandardMaterial({ color: 0xffd1a9 }));
     body.position.y = 1;
@@ -792,24 +805,22 @@
     body.castShadow = true;
     head.castShadow = true;
     group.add(body, head);
-    if (isPucca) {
-      const hairMaterial = new THREE.MeshStandardMaterial({ color: 0x171719, roughness: .9 });
-      const hair = new THREE.Mesh(new THREE.SphereGeometry(.55, 16, 12), hairMaterial);
-      hair.position.set(0, 2.18, -.04);
-      hair.scale.set(1, .62, .85);
-      group.add(hair);
-      [-.42, .42].forEach(x => {
-        const bun = new THREE.Mesh(new THREE.SphereGeometry(.22, 12, 10), hairMaterial);
-        bun.position.set(x, 2.34, -.02);
-        group.add(bun);
-      });
-      const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x171719 });
-      [-.17, .17].forEach(x => {
-        const eye = new THREE.Mesh(new THREE.SphereGeometry(.045, 8, 8), eyeMaterial);
-        eye.position.set(x, 1.98, .48);
-        group.add(eye);
-      });
-    }
+    const hairMaterial = new THREE.MeshStandardMaterial({ color: 0x171719, roughness: .9 });
+    const hair = new THREE.Mesh(new THREE.SphereGeometry(.55, 16, 12), hairMaterial);
+    hair.position.set(0, 2.18, -.04);
+    hair.scale.set(1, .62, .85);
+    group.add(hair);
+    [-.42, .42].forEach(x => {
+      const bun = new THREE.Mesh(new THREE.SphereGeometry(.22, 12, 10), hairMaterial);
+      bun.position.set(x, 2.34, -.02);
+      group.add(bun);
+    });
+    const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x171719 });
+    [-.17, .17].forEach(x => {
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(.045, 8, 8), eyeMaterial);
+      eye.position.set(x, 1.98, .48);
+      group.add(eye);
+    });
     const limbMaterial = new THREE.MeshStandardMaterial({ color: 0x263238, roughness: .9 });
     const leftArm = new THREE.Mesh(new THREE.CapsuleGeometry(.12, .55, 4, 8), limbMaterial);
     const rightArm = new THREE.Mesh(new THREE.CapsuleGeometry(.12, .55, 4, 8), limbMaterial);
@@ -1048,7 +1059,7 @@
 
   function resetGame() {
     score = 0;
-    distance = 400;
+    distance = startingDistance;
     life = 3;
     lane = 0;
     targetX = 0;
@@ -1134,7 +1145,7 @@
         } else {
           score++;
           scoreText.textContent = score;
-          distance = Math.max(0, distance - 60);
+          distance = Math.max(0, distance - distancePerRecycle);
           distanceText.textContent = distance;
           if (distance === 0) endGame("Você alcançou o ladrão e salvou a cidade!", true);
         }
