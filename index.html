@@ -1431,13 +1431,48 @@
     controls.style.display = "none";
   }
 
+  function bindHeldControl(buttonId, controlName) {
+    const button = document.getElementById(buttonId);
+    const release = () => {
+      heldControls[controlName] = false;
+    };
+    button.addEventListener("pointerdown", event => {
+      event.preventDefault();
+      heldControls[controlName] = true;
+      button.setPointerCapture(event.pointerId);
+    });
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach(eventName => {
+      button.addEventListener(eventName, release);
+    });
+  }
+
+  bindHeldControl("moveForward", "forward");
+  bindHeldControl("moveBackward", "backward");
+  bindHeldControl("crouch", "crouch");
   document.getElementById("left").addEventListener("click", () => move(-1));
   document.getElementById("right").addEventListener("click", () => move(1));
   document.getElementById("jump").addEventListener("click", jump);
+  boostButton.addEventListener("click", () => {
+    boosting = !boosting;
+    boostButton.setAttribute("aria-pressed", String(boosting));
+  });
   document.addEventListener("keydown", event => {
-    if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") move(-1);
-    if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") move(1);
-    if (event.key === "ArrowUp" || event.key === "w" || event.key === " ") jump();
+    const key = event.key.toLowerCase();
+    if (["arrowleft", "arrowright", "arrowup", "arrowdown", " "].includes(key)) event.preventDefault();
+    if (key === "arrowleft" || key === "a") move(-1);
+    if (key === "arrowright" || key === "d") move(1);
+    if (key === "arrowup" || key === " ") jump();
+    if (key === "w") heldControls.forward = true;
+    if (key === "s") heldControls.backward = true;
+    if (key === "arrowdown") heldControls.crouch = true;
+    if (key === "shift") boosting = true;
+  });
+  document.addEventListener("keyup", event => {
+    const key = event.key.toLowerCase();
+    if (key === "w") heldControls.forward = false;
+    if (key === "s") heldControls.backward = false;
+    if (key === "arrowdown") heldControls.crouch = false;
+    if (key === "shift") boosting = false;
   });
   addEventListener("resize", () => {
     if (!camera || !renderer) return;
