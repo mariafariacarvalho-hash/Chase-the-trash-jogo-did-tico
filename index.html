@@ -278,6 +278,49 @@
       line-height: 1.5;
     }
 
+    .power-picker {
+      margin: 16px 0 12px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 219, 88, .45);
+      border-radius: 10px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .power-label {
+      display: block;
+      margin-bottom: 10px;
+      color: #ffdb58;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .power-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .power-option {
+      flex: 1 1 90px;
+      min-height: 40px;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 8px;
+      background: #2a3d45;
+      color: white;
+      font: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+
+    .power-option.selected {
+      border-color: #ffdb58;
+      background: rgba(255, 219, 88, .14);
+      box-shadow: inset 0 0 0 1px rgba(255, 219, 88, .35);
+    }
+
     .intro-controls {
       color: #a9c5c8;
       font-size: 14px;
@@ -397,6 +440,7 @@
       font-size: 18px;
       font-weight: bold;
       cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease, opacity .15s ease, background .15s ease;
     }
 
     .math-choice:hover:not(:disabled),
@@ -407,6 +451,18 @@
     }
 
     .math-choice:disabled { cursor: default; opacity: .72; }
+
+    .math-choice.correct-choice {
+      border-color: #4ade80;
+      background: rgba(74, 222, 128, .14);
+      box-shadow: 0 0 12px rgba(74, 222, 128, .26);
+    }
+
+    .math-choice.wrong-choice {
+      border-color: rgba(255,255,255,.35);
+      background: rgba(255,255,255,.04);
+      opacity: .72;
+    }
 
     #mathFeedback {
       min-height: 24px;
@@ -714,7 +770,7 @@
     <div class="characters">
       <button class="character selected" data-character="pucca"><div class="avatar"><img class="pucca-art" src="https://m.media-amazon.com/images/M/MV5BNDExYTY3MDktNDBjMi00YTI0LTk5NmUtODg5YjdjYzc0OWI4XkEyXkFqcGdeQXRyYW5zY29kZS13b3JrZmxvdw@@._V1_QL75_UX500_CR0,24,500,281_.jpg" alt="Pucca" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 220 220%22%3E%3Crect width=%22220%22 height=%22220%22 rx=%2230%22 fill=%22%23f2c758%22/%3E%3Ctext x=%2250%25%22 y=%2252%25%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 font-size=%2282%22 font-family=%22Arial, sans-serif%22%3E🧧%3C/text%3E%3C/svg%3E';" /></div><div class="character-name">Pucca</div></button>
     </div>
-    <button id="playButton">▶ JOGAR</button>
+    <button id="playButton" type="button">▶ JOGAR</button>
     <div class="controls">← → mudar de faixa &nbsp; • &nbsp; ↑ pular</div>
   </main>
 </div>
@@ -727,12 +783,19 @@
     </div>
     <div class="intro-copy">
       <h2 id="introTitle">A cidade precisa de você</h2>
-      <p id="introMission">Recolha 100 lixos para alcançar Tobe. Garrafas valem 10 pontos; papel higiênico desconta 10. Pegue as cartas para responder contas matemáticas e ganhar bônus.</p>
+      <p id="introMission">Recolha 100 lixos e alcance 500 pontos para salvar a cidade. Garrafas valem 10 pontos; papel higiênico desconta 10. Responda as cartas matemáticas para ativar seu poder.</p>
+      <div class="power-picker" aria-label="Escolha o poder da carta">
+        <span class="power-label">Poder da carta</span>
+        <div class="power-options">
+          <button class="power-option selected" type="button" data-power="speed">⚡ Velocidade</button>
+          <button class="power-option" type="button" data-power="jump">🦘 Pulo</button>
+          <button class="power-option" type="button" data-power="board">🛹 Prancha</button>
+        </div>
+      </div>
       <p class="intro-controls">← → mudar de faixa &nbsp; • &nbsp; ↑ pular</p>
       <div class="intro-actions">
-        <button id="introBack" type="button">Voltar</button>
-        <button id="introStart" type="button">Começar a corrida</button>
-      </div>
+  <button id="introBack" type="button">Voltar</button>
+      <button id="introStart" type="button">Começar a corrida</button>
     </div>
   </section>
 </div>
@@ -826,6 +889,7 @@
   let fallenLogs = [];
 
   let selectedCharacter = "pucca";
+  let selectedPower = "speed";
 
   let running = false;
 
@@ -833,8 +897,12 @@
   let trashCount = 0;
   const trashLimit = 100;
   const pointsPerItem = 10;
-  const bonusDuration = 8000;
+  const bonusDuration = 50000;
   const startingDistance = 1000;
+  const winScore = 500;
+  const mathCardRespawnPoints = 40;
+  const mathCardRespawnMs = 50000;
+  const bonusCooldownMs = 15000;
   const mathQuestions = [
     { difficulty: "FÁCIL", problem: "25 + 37 = ?", options: ["62", "63"], correct: 0 },
     { difficulty: "FÁCIL", problem: "84 − 29 = ?", options: ["55", "54"], correct: 0 },
@@ -851,10 +919,36 @@
   let activeMathQuestion = null;
   let mathQuestionOpen = false;
   let mathAnswered = false;
+  let nextMathCardSpawnAt = 0;
+  let gameElapsedMs = 0;
+  let storyTriggered = false;
+  let lastBonusAt = 0;
+  let nextMathCardAtScore = mathCardRespawnPoints;
   let speedBonusUntil = 0;
   let superJumpUntil = 0;
   let boardCharges = 0;
-  const puccaImageUrl = "https://static.wikia.nocookie.net/pucca/images/8/8d/Pucca_Jetix.png/revision/latest/scale-to-width-down/1200?cb=20260605121452";
+  const puccaImageUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 220'>
+      <defs>
+        <linearGradient id='bg' x1='0%' x2='100%' y1='0%' y2='100%'>
+          <stop offset='0%' stop-color='#f6d86c'/>
+          <stop offset='100%' stop-color='#f0b249'/>
+        </linearGradient>
+      </defs>
+      <rect width='220' height='220' rx='30' fill='url(#bg)'/>
+      <circle cx='110' cy='82' r='42' fill='#f4cf9d'/>
+      <path d='M65 80c13-33 79-39 96 0v8H65z' fill='#171719'/>
+      <path d='M80 95c10-14 49-23 60 0v13H80z' fill='#f6d9c0' opacity='.4'/>
+      <circle cx='92' cy='84' r='5' fill='#171719'/>
+      <circle cx='128' cy='84' r='5' fill='#171719'/>
+      <path d='M95 104c6 8 17 11 24 0' fill='none' stroke='#a34042' stroke-width='5' stroke-linecap='round'/>
+      <path d='M88 124c16 19 28 19 44 0' fill='none' stroke='#d46361' stroke-width='7' stroke-linecap='round'/>
+      <path d='M60 138c10-11 24-17 36-18 13 16 29 18 40 18 5 0 9 5 9 11v26H53v-20c0-10 5-17 7-17z' fill='#d93d5a'/>
+      <path d='M95 150l13 22 15-22' fill='none' stroke='#e8a936' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/>
+      <circle cx='70' cy='142' r='8' fill='#f4cf9d'/>
+      <circle cx='150' cy='142' r='8' fill='#f4cf9d'/>
+    </svg>
+  `);
   let distance = startingDistance;
   let life = 5;
 
@@ -925,9 +1019,27 @@
   const restartButton = document.getElementById("restart");
   const finalScoreText = document.getElementById("finalScore");
   const restartWinButton = document.getElementById("restartWin");
+  const powerButtons = document.querySelectorAll(".power-option");
+
+  function updatePowerSelection() {
+    powerButtons.forEach(button => {
+      const isSelected = button.dataset.power === selectedPower;
+      button.classList.toggle("selected", isSelected);
+      button.setAttribute("aria-pressed", String(isSelected));
+    });
+  }
+
+  powerButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      selectedPower = button.dataset.power;
+      updatePowerSelection();
+    });
+  });
+
   document.getElementById("playButton").addEventListener("click", () => {
     menu.style.display = "none";
     intro.style.display = "flex";
+    updatePowerSelection();
     document.getElementById("introStart").focus();
   });
   document.getElementById("introBack").addEventListener("click", () => {
@@ -1057,32 +1169,67 @@
 
   function createMathCard() {
     const faceCanvas = document.createElement("canvas");
-    faceCanvas.width = 256;
-    faceCanvas.height = 320;
+    faceCanvas.width = 512;
+    faceCanvas.height = 640;
     const context = faceCanvas.getContext("2d");
-    context.fillStyle = "#fff4d8";
-    context.fillRect(0, 0, faceCanvas.width, faceCanvas.height);
-    context.strokeStyle = "#d83b49";
-    context.lineWidth = 12;
-    context.strokeRect(9, 9, faceCanvas.width - 18, faceCanvas.height - 18);
-    context.fillStyle = "#b52b3c";
-    context.font = "bold 44px Trebuchet MS, sans-serif";
+
+    const gradient = context.createLinearGradient(0, 0, 512, 640);
+    gradient.addColorStop(0, "#fffef4");
+    gradient.addColorStop(.35, "#fff0b2");
+    gradient.addColorStop(1, "#f7d37b");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 512, 640);
+
+    context.strokeStyle = "#d63043";
+    context.lineWidth = 18;
+    context.strokeRect(28, 28, 456, 584);
+
+    context.strokeStyle = "rgba(214, 48, 67, 0.55)";
+    context.lineWidth = 8;
+    context.strokeRect(58, 58, 396, 524);
+
+    context.fillStyle = "#9b1f2d";
+    context.fillRect(60, 96, 392, 110);
+    context.fillStyle = "#fff8de";
+    context.font = "700 52px Trebuchet MS, sans-serif";
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.fillText("1 + 1", 128, 160);
+    context.fillText("CARTA MÁGICA", 256, 151);
+
+    context.fillStyle = "#2d2149";
+    context.font = "700 90px Trebuchet MS, sans-serif";
+    context.fillText("?", 256, 315);
+
+    context.fillStyle = "#b93d4b";
+    context.font = "700 36px Trebuchet MS, sans-serif";
+    context.fillText("RESPOSTA", 256, 430);
+
+    context.fillStyle = "#61311d";
+    context.font = "700 26px Trebuchet MS, sans-serif";
+    context.fillText("ACERTE PARA GANHAR PODER", 256, 500);
+
+    const sparklePositions = [
+      [110, 170], [410, 180], [85, 470], [430, 500], [260, 570]
+    ];
+    sparklePositions.forEach(([x, y]) => {
+      context.fillStyle = "#ffe66d";
+      context.beginPath();
+      context.moveTo(x, y - 18); context.lineTo(x + 8, y - 4); context.lineTo(x + 20, y - 4); context.lineTo(x + 11, y + 5); context.lineTo(x + 16, y + 18); context.lineTo(x, y + 10); context.lineTo(x - 16, y + 18); context.lineTo(x - 11, y + 5); context.lineTo(x - 20, y - 4); context.lineTo(x - 8, y - 4); context.closePath();
+      context.fill();
+    });
 
     const faceTexture = new THREE.CanvasTexture(faceCanvas);
     faceTexture.colorSpace = THREE.SRGBColorSpace;
     const card = new THREE.Group();
     const backing = new THREE.Mesh(
-      new THREE.BoxGeometry(.82, 1.08, .07),
-      new THREE.MeshStandardMaterial({ color: 0x9e2638, roughness: .7 })
+      new THREE.BoxGeometry(.9, 1.18, .08),
+      new THREE.MeshStandardMaterial({ color: 0xa22b32, roughness: .7, metalness: .12 })
     );
     const face = new THREE.Mesh(
-      new THREE.PlaneGeometry(.72, .98),
+      new THREE.PlaneGeometry(.8, 1.08),
       new THREE.MeshBasicMaterial({ map: faceTexture })
     );
-    face.position.z = .041;
+    face.position.z = .045;
     backing.castShadow = true;
     card.add(backing, face);
     return card;
@@ -1098,6 +1245,7 @@
     mathChoiceButtons.forEach((button, index) => {
       button.textContent = `${index === 0 ? "A" : "B"}) ${activeMathQuestion.options[index]}`;
       button.disabled = false;
+      button.classList.remove("correct-choice", "wrong-choice");
     });
     mathPopup.classList.add("active");
     mathQuestionOpen = true;
@@ -1109,7 +1257,19 @@
     mathAnswered = true;
     mathChoiceButtons.forEach(button => { button.disabled = true; });
     clearTimeout(mathPopupTimer);
-    if (answerIndex !== activeMathQuestion.correct) {
+
+    const correctChoiceIndex = activeMathQuestion.correct;
+    mathChoiceButtons.forEach((button, index) => {
+      button.classList.remove("correct-choice", "wrong-choice");
+      if (index === correctChoiceIndex) {
+        button.classList.add("correct-choice");
+      }
+      if (index === answerIndex && index !== correctChoiceIndex) {
+        button.classList.add("wrong-choice");
+      }
+    });
+
+    if (answerIndex !== correctChoiceIndex) {
       mathFeedbackText.textContent = "Resposta errada! Pucca morreu.";
       mathPopupTimer = setTimeout(() => {
         mathPopup.classList.remove("active");
@@ -1120,8 +1280,8 @@
       return;
     }
 
-    const bonusMessage = grantRandomBonus();
-    mathFeedbackText.textContent = `Resposta certa! Bônus: ${bonusMessage}`;
+    const bonusMessage = applySelectedPower();
+    mathFeedbackText.textContent = `Resposta certa! Poder ativado: ${bonusMessage}`;
     mathPopupTimer = setTimeout(() => {
       mathPopup.classList.remove("active");
       mathQuestionOpen = false;
@@ -1129,20 +1289,24 @@
     }, 1400);
   }
 
-  function grantRandomBonus() {
-    const bonus = Math.floor(Math.random() * 3);
-    if (bonus === 0) {
-      speedBonusUntil = performance.now() + bonusDuration;
+  function applySelectedPower() {
+    const now = performance.now();
+    if (now - lastBonusAt < bonusCooldownMs) {
+      return "próximo bônus em 15 segundos";
+    }
+    lastBonusAt = now;
+    if (selectedPower === "speed") {
+      speedBonusUntil = now + bonusDuration;
       speed = .68;
-      return "velocidade por 8 segundos!";
+      return "velocidade por 50 segundos!";
     }
-    if (bonus === 1) {
-      superJumpUntil = performance.now() + bonusDuration;
-      return "super pulo por 8 segundos!";
+    if (selectedPower === "jump") {
+      superJumpUntil = now + bonusDuration;
+      return "super pulo por 50 segundos!";
     }
-    boardCharges = Math.min(boardCharges + 1, 1);
+    boardCharges = 1;
     boardChargesText.textContent = boardCharges;
-    return "prancha protege de um impacto!";
+    return "prancha protege de um impacto por 50 segundos!";
   }
 
   function createToiletPaper() {
@@ -1346,21 +1510,22 @@
     camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, .1, 1000);
     camera.position.set(0, 5.5, 10);
     camera.lookAt(0, 1, 0);
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
     renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio * 1.4, 2.6));
     renderer.setSize(innerWidth, innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.needsUpdate = true;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.15;
     document.getElementById("game").replaceChildren(renderer.domElement);
     scene.add(new THREE.HemisphereLight(0xdcecff, 0x4a4b42, 1.55));
     const sun = new THREE.DirectionalLight(0xfff1d6, 2.1);
     sun.position.set(-18, 24, -18);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.mapSize.set(4096, 4096);
     sun.shadow.camera.left = -25;
     sun.shadow.camera.right = 25;
     sun.shadow.camera.top = 25;
@@ -1434,11 +1599,13 @@
     mathCards = [];
     for (let index = 0; index < 8; index++) {
       const card = createMathCard();
-      card.position.set((index % 3 - 1) * laneWidth, 1.15, -20 - index * 26);
+      card.visible = false;
+      card.position.set((index % 3 - 1) * laneWidth, 1.15, -200 - index * 20);
       card.userData.routeIndex = index;
       scene.add(card);
       mathCards.push(card);
     }
+    nextMathCardSpawnAt = performance.now() + mathCardRespawnMs;
 
     obstacles = [];
     for (let index = 0; index < 4; index++) {
@@ -1496,6 +1663,11 @@
     mathQuestionIndex = 0;
     mathQuestionOpen = false;
     activeMathQuestion = null;
+    nextMathCardSpawnAt = performance.now() + 50000;
+    gameElapsedMs = 0;
+    storyTriggered = false;
+    lastBonusAt = 0;
+    nextMathCardAtScore = mathCardRespawnPoints;
     speedBonusUntil = 0;
     superJumpUntil = 0;
     boardCharges = 0;
@@ -1531,6 +1703,12 @@
     requestAnimationFrame(gameLoop);
   }
 
+  window.startGame = startGame;
+  window.startIntroGame = function () {
+    intro.style.display = "none";
+    startGame();
+  };
+
   function move(direction) {
     if (!running) return;
     lane = Math.max(-1, Math.min(1, lane + direction));
@@ -1563,6 +1741,7 @@
       return;
     }
     const delta = Math.min(clock.getDelta(), .05);
+    gameElapsedMs += delta * 1000;
     player.position.x += (targetX - player.position.x) * .15;
     if (heldControls.forward) player.position.z = Math.max(-1, player.position.z - delta * 5);
     if (heldControls.backward) player.position.z = Math.min(5, player.position.z + delta * 5);
@@ -1646,7 +1825,12 @@
         scoreText.textContent = score;
         distance = startingDistance * (trashLimit - trashCount) / trashLimit;
         distanceText.textContent = Math.ceil(distance);
-        if (trashCount >= trashLimit) endGame("Você recolheu os 100 lixos e salvou a cidade!", true);
+        if (score >= winScore) {
+          if (!storyTriggered) {
+            storyTriggered = true;
+            endGame(`Você alcançou ${winScore} pontos e salvou a cidade!`, true);
+          }
+        }
       }
     });
     mathCards.forEach(card => {
