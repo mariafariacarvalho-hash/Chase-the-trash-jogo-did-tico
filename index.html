@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>🗑️ Metro Recicla - Corrida Infinita</title>
+  <link rel="stylesheet" href=".vscode/style.css" />
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div class="hud-item">🏆 <span id="score">0</span></div>
+      <div class="hud-item">♻️ <span id="recycled">0</span></div>
+      <div class="hud-item">⚡ <span id="speed">1.0</span>x</div>
+    </div>
+
+    <!-- Menu Inicial -->
+    <div id="start-screen" class="overlay">
+      <h1>🗑️ METRO RECICLA</h1>
+      <p>Corra pelos trilhos, colete recicláveis e bata seu recorde!</p>
+      <p class="controls">⬅️ ➡️ ou A/D para desviar &nbsp;|&nbsp; ⬆️ ou W para pular</p>
+      <button id="start-btn">▶ JOGAR</button>
+    </div>
+
+    <!-- Game Over -->
+    <div id="game-over" class="overlay hidden">
+      <h1>💥 FIM DE JOGO</h1>
+      <p>Pontuação: <strong id="final-score">0</strong></p>
+      <p>Itens reciclados: <strong id="final-recycled">0</strong></p>
+      <p>Recorde: <strong id="best-score">0</strong></p>
+      <button id="restart-btn">🔄 JOGAR NOVAMENTE</button>
+    </div>
+  </div>
+
+  <script src=".vscode/game.js"></script>
+</body>
+</html>
